@@ -10,7 +10,47 @@ class CustomerSuccessBalancing
   
   #Returns the ID of the customer success with most customers
   def execute
-  end
+    # Filter out customer success IDs that are away
+    available_customer_success = @customer_success.reject { |cs| @away_customer_success.include?(cs[:id]) }
+  
+    # Sort customer success by score (ascending)
+    available_customer_success.sort_by! { |cs| cs[:score] }
+  
+    # Initialize an array to track the number of assigned customers for each available customer success
+    assigned_customers = Array.new(available_customer_success.length, 0)
+  
+    # Assign customers to available customer success in a greedy way
+    @customers.each do |customer|
+      # Use binary search to find the first available CSM that can handle the customer
+      i = 0
+      j = available_customer_success.length - 1
+      while i <= j
+        mid = (i + j) / 2
+        if customer[:score] <= available_customer_success[mid][:score]
+          j = mid - 1
+        else
+          i = mid + 1
+        end
+      end
+  
+      # Assign customer to the first available customer success that can handle it
+      if i < available_customer_success.length
+        assigned_customers[i] += 1
+      end
+    end
+  
+    # Find the customer success with the most assigned customers
+    if assigned_customers.any?
+      max_assigned = assigned_customers.max
+      if assigned_customers.count(max_assigned) == 1
+        available_customer_success[assigned_customers.index(max_assigned)][:id]
+      else
+        0
+      end
+    else
+      0
+    end
+  end  
 end  
 
 class CustomerSuccessBalancingTests < Minitest::Test
