@@ -61,6 +61,6 @@ For this example, the return should be `1`, which is the id of the CS serving 4 
 In the terminal, run the commands:
 
 ```
-cd ruby
+cd challenge-customer-success-balancing
 ruby customer_success_balancing.rb
 ```
